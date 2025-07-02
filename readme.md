@@ -1,46 +1,174 @@
+
+```markdown
 # PiBabyMonitor
 
-A Raspberry Pi baby monitoring system streaming live video and audio over your local network. Built with Flask, OpenCV, and FFmpeg, it supports multiple clients, automatic camera reset, and runs as a systemd service for easy startup.
+A simple Raspberry Pi baby monitor system using Flask.  
+It streams live video from the Pi camera and supports audio streaming via ffmpeg.  
+Designed to run on a Raspberry Pi and accessible from your local network.
 
 ---
-
-![PiBabyMonitor Demo](assets/demo.gif)
-
 
 ## Features
 
-- Live video streaming with automatic camera recovery  
-- Live audio streaming powered by FFmpeg and ALSA  
-- Supports multiple simultaneous viewers  
-- Runs as a systemd service on Raspberry Pi for automatic startup  
-- Simple web interface accessible from any device on your LAN  
-- Easy to extend and customize  
+- Live video streaming from Raspberry Pi camera (OpenCV)
+- Audio streaming via `ffmpeg` (HLS format)
+- Easy reset of the camera via a Flask API endpoint
+- Runs as a systemd service for automatic startup and easy management
 
 ---
 
-## Hardware Requirements
+## Project Structure
 
-- Raspberry Pi (any model with camera support)  
-- USB or Pi Camera Module  
-- Microphone or audio input device  
+```
+
+camera-project/
+├── app.py                # Main Flask app
+├── static/
+│   ├── hls/              # Folder for audio streaming files (auto-cleaned)
+│   └── assets/           # Place your demo.gif here (if used)
+├── templates/
+│   └── index.html        # Main HTML page
+├── requirements.txt      # Python dependencies
+└── README.md             # This file
+
+````
 
 ---
 
-## Software Requirements
+## Installation & Setup
 
-- Raspberry Pi OS (or compatible Linux distro)  
-- Python 3  
-- OpenCV (`opencv-python`)  
-- Flask  
-- FFmpeg  
-- ALSA utilities  
+### 1. Clone the repository on your Raspberry Pi
+
+```bash
+git clone https://github.com/OnlyShoky/PiBabyMonitor.git
+cd pibabymonitor
+````
+
+### 2. Install Python dependencies
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+### 3. Install system dependencies for ffmpeg and OpenCV (if not installed)
+
+```bash
+sudo apt update
+sudo apt install ffmpeg python3-opencv
+```
+
+### 4. Run the app locally (for testing)
+
+```bash
+python3 app.py
+```
+
+Then open your browser and navigate to:
+
+```
+http://<your-raspberry-pi-ip>:5000
+```
 
 ---
 
-## Installation
+## Using the Systemd Service (Recommended for production)
 
-1. Clone this repo or copy files to your Raspberry Pi.
+To keep the app running automatically on boot and in the background, set up a systemd service:
 
-2. Install Python dependencies:
-   ```bash
-   pip3 install -r requirements.txt
+### Create the systemd service file
+
+```bash
+sudo nano /etc/systemd/system/camera-project.service
+```
+
+### Paste the following content
+
+```ini
+[Unit]
+Description=Flask Camera Project
+After=network.target
+
+[Service]
+User=shoky
+WorkingDirectory=/home/shoky/Desktop/Projects/camera-project
+ExecStart=/usr/bin/python3 /home/shoky/Desktop/Projects/camera-project/app.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Enable and start the service
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable camera-project.service
+sudo systemctl start camera-project.service
+```
+
+### Manage the service
+
+* Check status:
+
+```bash
+sudo systemctl status camera-project.service
+```
+
+* Stop service:
+
+```bash
+sudo systemctl stop camera-project.service
+```
+
+* Restart service:
+
+```bash
+sudo systemctl restart camera-project.service
+```
+
+* Disable autostart:
+
+```bash
+sudo systemctl disable camera-project.service
+```
+
+---
+
+## Notes
+
+* Verify your Python interpreter path with `which python3` and update the service file if needed.
+* If you use a virtual environment or environment variables, adjust the `ExecStart` accordingly.
+* The service runs as user `shoky`. Ensure that this user has proper permissions to access the camera and folders.
+* The app automatically cleans temporary streaming files on startup.
+* Audio streaming runs as an `ffmpeg` subprocess managed by the Flask app.
+
+---
+
+## Troubleshooting
+
+* If the camera feed stops or fails, use the `/reset_camera` endpoint to reset the camera without restarting the whole app.
+* Make sure your camera device is correctly configured and accessible by OpenCV (`/dev/video0`).
+* Check `journalctl -u camera-project.service` for logs if running as a systemd service.
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Contact
+
+For questions or suggestions, open an issue or contact `mohamed.elmoag@gmail.com`.
+
+---
+
+Thank you for using PiBabyMonitor! 👶📹
+
+```
+
+---
+
+Would you like me to help you generate `requirements.txt`, the `index.html` template, or other project files as well?
+```
