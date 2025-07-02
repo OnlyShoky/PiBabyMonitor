@@ -7,6 +7,9 @@ Designed to run on a Raspberry Pi and accessible from your local network.
 
 ---
 
+![PiBabyMonitor Demo](assets/demo.gif)
+
+
 ## Features
 
 - Live video streaming from Raspberry Pi camera (OpenCV)
