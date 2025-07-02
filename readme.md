@@ -166,8 +166,3 @@ For questions or suggestions, open an issue or contact `your-email@example.com`.
 Thank you for using PiBabyMonitor! 👶📹
 
 ```
-
----
-
-If you want, I can save it as a file in your environment. Just say the word!
-```
