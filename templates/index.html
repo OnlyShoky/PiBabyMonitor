@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cámara de Nayara 💖</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comfortaa&display=swap');
+
+    body {
+      background: linear-gradient(135deg, #ffd6e8 0%, #ffe9f1 100%);
+      font-family: 'Comfortaa', cursive, sans-serif;
+      color: #9c3d7f;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px #e78fcc;
+    }
+
+    .camera-container {
+      background: #fff0f6;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 6px 15px rgba(201, 84, 136, 0.3);
+      max-width: 700px;
+      width: 90vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .video-audio-wrapper {
+      position: relative;
+      border: 4px solid #f9c1db;
+      border-radius: 25px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(201, 84, 136, 0.5);
+      background: #ffe9f1;
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Video styling as img */
+    #video {
+      display: block;
+      width: 100%;
+      border-radius: 25px 25px 0 0;
+      background: black;
+      user-select: none;
+    }
+
+    /* Audio styling */
+    #audio {
+      width: 100%;
+      outline: none;
+      border-radius: 0 0 25px 25px;
+      box-shadow: inset 0 0 10px #f9c1db;
+      background: #ffe9f1;
+    }
+
+    /* Título del audio */
+    .audio-label {
+      font-weight: 600;
+      color: #b8396f;
+      text-align: center;
+      margin: 15px 0 5px;
+      text-shadow: 0 0 8px #f9c1db;
+      font-size: 1.1rem;
+    }
+
+    /* Indicador vivo */
+    .live-indicator {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+      background: #e4425e;
+      padding: 5px 12px;
+      border-radius: 20px;
+      box-shadow: 0 0 8px #e4425e;
+      animation: pulse 2s infinite;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .live-indicator::before {
+      content: "";
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #ff3b5c;
+      border-radius: 50%;
+      margin-right: 8px;
+      box-shadow: 0 0 8px #ff3b5c;
+    }
+
+    /* Fullscreen button */
+    #fullscreen-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(201, 84, 136, 0.8);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      padding: 6px 12px;
+      cursor: pointer;
+      z-index: 11;
+      user-select: none;
+      transition: background 0.3s ease;
+    }
+
+    #fullscreen-btn:hover {
+      background: rgba(201, 84, 136, 1);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    /* Fullscreen styles */
+    :fullscreen .video-audio-wrapper,
+    :-webkit-full-screen .video-audio-wrapper {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: black !important;
+    }
+
+    :fullscreen #video,
+    :-webkit-full-screen #video {
+      width: 100vw !important;
+      height: 100vh !important;
+      border-radius: 0 !important;
+      object-fit: contain;
+    }
+
+    footer {
+      margin-top: auto;
+      font-size: 0.9rem;
+      color: #bb6699aa;
+      text-align: center;
+      padding: 10px 0;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>👶 Cámara de Nayara</h1>
+
+<div class="camera-container">
+  <div class="video-audio-wrapper">
+    <div class="live-indicator">EN VIVO</div>
+    <button id="fullscreen-btn" title="Pantalla completa">⛶</button>
+    <img id="video" src="{{ url_for('video_feed') }}" alt="Video en vivo de Nayara" />
+    <audio id="audio" controls autoplay></audio>
+  </div>
+
+  <!-- Reset camera button here -->
+  <button id="reset-camera-btn" style="margin-top: 15px; padding: 10px 20px; background:#c95388; color: white; border:none; border-radius: 12px; cursor:pointer;">
+    🔄 Reset Camera
+  </button>
+</div>
+
+  <footer>💖 En vivo para cuidar a nuestra pequeña Nayara 💖</footer>
+
+  <script>
+    const audio = document.getElementById('audio');
+
+    // Setup HLS audio only
+    if (Hls.isSupported()) {
+      const hlsAudio = new Hls();
+      hlsAudio.loadSource('{{ url_for("static", filename="hls/audio.m3u8") }}');
+      hlsAudio.attachMedia(audio);
+      hlsAudio.on(Hls.Events.MANIFEST_PARSED, () => audio.play());
+    } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+      audio.src = '{{ url_for("static", filename="hls/audio.m3u8") }}';
+      audio.addEventListener('loadedmetadata', () => audio.play());
+    }
+
+    // Fullscreen toggle
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const videoWrapper = document.querySelector('.video-audio-wrapper');
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        if (videoWrapper.requestFullscreen) {
+          videoWrapper.requestFullscreen();
+        } else if (videoWrapper.webkitRequestFullscreen) { /* Safari */
+          videoWrapper.webkitRequestFullscreen();
+        } else if (videoWrapper.msRequestFullscreen) { /* IE11 */
+          videoWrapper.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    });
+
+    const resetBtn = document.getElementById('reset-camera-btn');
+const videoImg = document.getElementById('video');
+
+resetBtn.addEventListener('click', () => {
+  fetch('/reset_camera', { method: 'POST' })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data.status);
+      // Reload the video image to reflect reset camera stream
+      // Add a timestamp to bypass cache
+      videoImg.src = '{{ url_for("video_feed") }}' + '?t=' + new Date().getTime();
+    })
+    .catch(err => console.error('Error resetting camera:', err));
+});
+
+  </script>
+</body>
+</html>
