@@ -157,12 +157,6 @@ MIT License
 
 ---
 
-## Contact
-
-For questions or suggestions, open an issue or contact `your-email@example.com`.
-
----
 
 Thank you for using PiBabyMonitor! 👶📹
 
-```
