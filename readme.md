@@ -1,5 +1,4 @@
 
-```markdown
 # PiBabyMonitor
 
 A simple Raspberry Pi baby monitor system using Flask.  
@@ -40,7 +39,7 @@ camera-project/
 ### 1. Clone the repository on your Raspberry Pi
 
 ```bash
-git clone https://github.com/OnlyShoky/PiBabyMonitor.git
+git clone https://github.com/yourusername/pibabymonitor.git
 cd pibabymonitor
 ````
 
@@ -160,7 +159,7 @@ MIT License
 
 ## Contact
 
-For questions or suggestions, open an issue or contact `mohamed.elmoag@gmail.com`.
+For questions or suggestions, open an issue or contact `your-email@example.com`.
 
 ---
 
@@ -170,5 +169,5 @@ Thank you for using PiBabyMonitor! 👶📹
 
 ---
 
-Would you like me to help you generate `requirements.txt`, the `index.html` template, or other project files as well?
+If you want, I can save it as a file in your environment. Just say the word!
 ```
